@@ -1,163 +1,154 @@
 "use client";
+
 import { useEffect, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { priceRanges } from "@/util/filterdata";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { useSearchParams } from "next/navigation";
 
 export default function ProductFilter() {
   const [categories, setCategories] = useState([]);
+  const router = useRouter();
+  const searchParams = useSearchParams();
   const pathname = "/shop";
-  const params = useSearchParams();
 
-  const getCategories = async () => {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/category`, {
-      method: "GET",
-      cache: "no-store",
-    });
-
-    const data = await res.json();
-    setCategories(data);
-  };
-
+  // Fetch categories
   useEffect(() => {
-    getCategories();
+    const fetchCategories = async () => {
+      try {
+        const res = await fetch(
+          `${process.env.NEXT_PUBLIC_API_URL}/api/category`,
+          {
+            method: "GET",
+            cache: "no-store",
+          }
+        );
+
+        const data = await res.json();
+        setCategories(data);
+      } catch (err) {
+        console.error("Error fetching categories:", err);
+      }
+    };
+
+    fetchCategories();
   }, []);
 
-  const router = useRouter();
-  // console.log(router);
-
-  const activeButton = "btn btn-primary btn-raised mx-1 rounded-pill";
-  const button = "btn btn-raised mx-1 rounded-pill";
-
-  const handleRemoveFilter = (filterName) => {
-    // const updatedSearchParams = { ...searchParams };
-    // const updatedSearchParams = useSearchParams();
-    // delete updatedSearchParams[filterName];
-    let newParams = new URLSearchParams(params.toString());
-
-    // if filterName is string
-    if (typeof filterName === "string") {
-      newParams.delete(filterName);
-    }
-    // if filterName is array
-    if (Array.isArray(filterName)) {
-      filterName?.forEach((name) => {
-        newParams.delete(name);
-      });
-    }
-
-    // reset page to 1 when applying new filtering options
-    newParams.page = 1;
-
-    const queryString = newParams.toString();
-    console.log(queryString, "qs");
-
-    const newUrl = `${pathname}?${queryString}`;
-    router.push(newUrl);
-  };
-
+  // Helper: Create query string
   const createQueryString = (name, value) => {
-    let newParams = new URLSearchParams(params.toString());
+    const params = new URLSearchParams(searchParams.toString());
 
     if (Array.isArray(name) && Array.isArray(value)) {
-      // console.log(name, value, "val");
-
-      // name =["minPrice", "maxPrice"]
-      // value = [range?.min, range?.max]
-      name.forEach((n, index) => {
-        newParams.set(n, value[index]);
+      name.forEach((key, i) => {
+        params.set(key, value[i]);
       });
-      newParams.set("page", 1);
-
-      return newParams.toString();
+    } else {
+      params.set(name, value);
     }
 
-    if (typeof name === "string") {
-      newParams.set(name, value);
-      newParams.set("page", 1);
-      return newParams.toString();
-    }
+    // Reset to page 1 on any filter change
+    params.set("page", 1);
+
+    return params.toString();
   };
 
+  // Helper: Remove filter(s)
+  const removeFilters = (keys) => {
+    const params = new URLSearchParams(searchParams.toString());
+    if (Array.isArray(keys)) {
+      keys.forEach((key) => params.delete(key));
+    } else {
+      params.delete(keys);
+    }
+
+    params.set("page", 1);
+    router.push(`${pathname}?${params.toString()}`);
+  };
+
+  // Reusable styles
+  const baseBtn =
+    "px-4 py-1 text-sm rounded-full font-medium transition border";
+  const activeBtn = `${baseBtn} bg-blue-600 text-white border-blue-600`;
+  const inactiveBtn = `${baseBtn} bg-gray-100 text-gray-700 border-gray-300`;
+
   return (
-    <div className="mb-5 overflow-scroll">
-      <p className="lead">Filter Products</p>
-
-      <Link className="text-danger" href="/shop">
-        Clear Filters
-      </Link>
-
-      <p className="mt-4 alert alert-primary">Price</p>
-      <div className="row d-flex align-items-center mx-1">
-        {priceRanges?.map((range) => {
-          console.log(params, "mini");
-
-          const isActive =
-            params.get("minPrice") === String(range?.min) &&
-            params.get("maxPrice") === String(range?.max);
-          return (
-            <div key={range?.label}>
-              <button
-                className={isActive ? activeButton : button}
-                onClick={() => {
-                  console.log(
-                    createQueryString(
-                      ["minPrice", "maxPrice"],
-                      [range?.min, range?.max]
-                    )
-                  );
-                  router.push(
-                    `${pathname}?${createQueryString(
-                      ["minPrice", "maxPrice"],
-                      [range?.min, range?.max]
-                    )}`
-                  );
-                }}
-              >
-                {range?.label}
-              </button>
-              {isActive && (
-                <button
-                  onClick={() => handleRemoveFilter(["minPrice", "maxPrice"])}
-                  className="pointer"
-                >
-                  X
-                </button>
-              )}
-            </div>
-          );
-        })}
+    <div className="space-y-6 pr-2">
+      {/* Header */}
+      <div>
+        <h2 className="text-xl font-semibold mb-1">Filter Products</h2>
+        <Link href="/shop" className="text-red-600 text-sm hover:underline">
+          ✖ Clear All Filters
+        </Link>
       </div>
 
-      <p className="mt-4 alert alert-primary">Categories</p>
-      <div className="row d-flex align-items-center mx-1 filter-scroll">
-        {categories?.map((c) => {
-          const isActive = params.get("category") === c._id;
+      {/* Price Filter */}
+      <div>
+        <h3 className="text-md font-semibold text-blue-600 mb-2">💰 Price</h3>
+        <div className="flex flex-wrap gap-2">
+          {priceRanges.map((range) => {
+            const isActive =
+              searchParams.get("minPrice") === String(range.min) &&
+              searchParams.get("maxPrice") === String(range.max);
 
-          return (
-            <div key={c._id}>
-              <button
-                className={isActive ? activeButton : button}
-                onClick={() => {
-                  router.push(
-                    `${pathname}?${createQueryString("category", c._id)}`
-                  );
-                }}
-              >
-                {c?.title}
-              </button>
-              {isActive && (
+            return (
+              <div key={range.label} className="flex items-center gap-1">
                 <button
-                  onClick={() => handleRemoveFilter("category")}
-                  className="pointer"
+                  className={isActive ? activeBtn : inactiveBtn}
+                  onClick={() =>
+                    router.push(
+                      `${pathname}?${createQueryString(
+                        ["minPrice", "maxPrice"],
+                        [range.min, range.max]
+                      )}`
+                    )
+                  }
                 >
-                  X
+                  {range.label}
                 </button>
-              )}
-            </div>
-          );
-        })}
+                {isActive && (
+                  <button
+                    onClick={() => removeFilters(["minPrice", "maxPrice"])}
+                    className="text-red-500 font-bold text-sm"
+                  >
+                    ✕
+                  </button>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* Category Filter */}
+      <div>
+        <h3 className="text-md font-semibold text-blue-600 mb-2">🗂 Category</h3>
+        <div className="flex flex-wrap gap-2">
+          {categories.map((c) => {
+            const isActive = searchParams.get("category") === c._id;
+
+            return (
+              <div key={c._id} className="flex items-center gap-1">
+                <button
+                  className={isActive ? activeBtn : inactiveBtn}
+                  onClick={() =>
+                    router.push(
+                      `${pathname}?${createQueryString("category", c._id)}`
+                    )
+                  }
+                >
+                  {c.title}
+                </button>
+                {isActive && (
+                  <button
+                    onClick={() => removeFilters("category")}
+                    className="text-red-500 font-bold text-sm"
+                  >
+                    ✕
+                  </button>
+                )}
+              </div>
+            );
+          })}
+        </div>
       </div>
     </div>
   );

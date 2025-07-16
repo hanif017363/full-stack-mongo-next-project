@@ -2,10 +2,11 @@ import ProductCard from "./components/ProductCard";
 import Pagination from "@/app/components/Pagination";
 
 const getProducts = async (searchParams) => {
+  // Await searchParams to resolve the promise
+  const resolvedSearchParams = await searchParams;
   const searchQuery = new URLSearchParams({
-    page: searchParams?.page || 1,
+    page: resolvedSearchParams?.page || 1,
   }).toString();
-  console.log(searchQuery, "sQuery");
 
   const res = await fetch(
     `${process.env.NEXT_PUBLIC_API_URL}/api/product?${searchQuery}`,
@@ -25,30 +26,36 @@ const getProducts = async (searchParams) => {
     totalPages: data?.totalPages,
   };
 };
-export default async function Home({ searchParams }) {
-  // console.log(searchParams, "srchparamas");
 
+export default async function Home({ searchParams }) {
   const data = await getProducts(searchParams);
 
   return (
-    <main>
+    <main className="min-h-screen bg-gray-50">
       <div>
-        <div className="page-banner">
-          <div className="page-banner__details">
-            <div className="page-banner__details__title">
-              <h1>Our E-commerce Website</h1>
+        {/* Banner Section */}
+        <div className="page-banner bg-gradient-to-r from-blue-600 to-indigo-700 text-white py-16">
+          <div className="page-banner__details max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="page-banner__details__title text-center">
+              <h1 className="text-4xl sm:text-5xl font-bold tracking-tight text-red-500">
+                Our E-commerce Website
+              </h1>
             </div>
           </div>
         </div>
-        <div className="section">
-          <div className="container">
-            <div className="section__head">
+
+        {/* Products Section */}
+        <div className="section py-12">
+          <div className="container max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="section__head mb-8">
               <div className="product__details__title">
-                <h2>Filtered Products</h2>
+                <h2 className="text-2xl sm:text-3xl font-semibold text-gray-800">
+                  Filtered Products
+                </h2>
               </div>
             </div>
             <div className="section__content">
-              <div className="grid three">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                 {data?.products?.map((product) => (
                   <ProductCard key={product._id} product={product} />
                 ))}
@@ -57,11 +64,15 @@ export default async function Home({ searchParams }) {
           </div>
         </div>
       </div>
-      <Pagination
-        // currentPage={data?.currentPage}
-        totalPages={data?.totalPages}
-        pathname={"/"}
-      />
+
+      {/* Pagination */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <Pagination
+          currentPage={data?.currentPage}
+          totalPages={data?.totalPages}
+          pathname={"/"}
+        />
+      </div>
     </main>
   );
 }

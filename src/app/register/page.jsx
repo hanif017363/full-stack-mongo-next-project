@@ -1,17 +1,16 @@
 "use client";
 
-import { useRouter } from "next/navigation"; // ✅ Correct import for app router
+import { useRouter } from "next/navigation";
 import { useState } from "react";
-// ✅ Removed unnecessary `use`
 
 const Register = () => {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
-  const [errorMessage, setErrorMessage] = useState(""); // ✅ Fixed variable name
+  const [errorMessage, setErrorMessage] = useState("");
 
-  const router = useRouter(); // ✅ Renamed from `route` to `router` for clarity
+  const router = useRouter();
 
   const submitHandler = async (e) => {
     e.preventDefault();
@@ -44,48 +43,80 @@ const Register = () => {
   };
 
   return (
-    <main>
-      <section>
-        <h1>Register</h1>
+    <main className="min-h-screen bg-gray-50 flex items-center justify-center py-12">
+      <section className="max-w-md w-full bg-white shadow-md rounded-lg p-8">
+        <h1 className="text-3xl font-bold text-gray-800 text-center mb-6">
+          Register
+        </h1>
 
-        <form onSubmit={submitHandler}>
-          <div>
-            <label htmlFor="name">Your Name:</label>
+        <form onSubmit={submitHandler} className="space-y-6">
+          <div className="flex flex-col">
+            <label
+              htmlFor="name"
+              className="text-sm font-medium text-gray-700 mb-1"
+            >
+              Your Name
+            </label>
             <input
               type="text"
               id="name"
               value={name}
               onChange={(e) => setName(e.target.value)}
               required
+              className="border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              placeholder="Enter your name"
             />
           </div>
 
-          <div>
-            <label htmlFor="email">Your Email</label>
+          <div className="flex flex-col">
+            <label
+              htmlFor="email"
+              className="text-sm font-medium text-gray-700 mb-1"
+            >
+              Your Email
+            </label>
             <input
               type="email"
               id="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
+              className="border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              placeholder="Enter your email"
             />
           </div>
 
-          <div>
-            <label htmlFor="password">Your Password</label>
+          <div className="flex flex-col">
+            <label
+              htmlFor="password"
+              className="text-sm font-medium text-gray-700 mb-1"
+            >
+              Your Password
+            </label>
             <input
               type="password"
               id="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
+              className="border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              placeholder="Enter your password"
             />
           </div>
 
-          <div>
-            {!loading && <button type="submit">Register</button>}
-            {loading && <p>Creating New User...</p>}
-            {errorMessage && <p style={{ color: "red" }}>{errorMessage}</p>}
+          <div className="flex flex-col items-center">
+            {!loading && (
+              <button
+                type="submit"
+                className="bg-blue-600 text-white font-semibold py-2 px-4 rounded-md hover:bg-blue-700 transition-colors"
+              >
+                Register
+              </button>
+            )}
+            {loading && <p className="text-gray-600">Creating New User...</p>}
+            {errorMessage && (
+              <p className="text-red-500 text-sm mt-2">{errorMessage}</p>
+            )}
           </div>
         </form>
       </section>

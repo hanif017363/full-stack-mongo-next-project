@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import connectDb from "@/utils/db";
+import connectDb from "@/util/db";
 import Product from "@/models/product";
 import queryString from "query-string";
 
@@ -25,7 +25,6 @@ export async function GET(req) {
       .skip(skip)
       .limit(pageSize)
       .sort({ createdAt: -1 });
-    // console.log(filteredProducts, "fill");
 
     const totalFilteredProducts = await Product.find(filter);
     return NextResponse.json(
@@ -37,7 +36,6 @@ export async function GET(req) {
       { status: 200 }
     );
   } catch (err) {
-    console.log(err);
     return NextResponse.json(
       {
         err: err.message,

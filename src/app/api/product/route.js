@@ -1,24 +1,3 @@
-const product = [
-  {
-    id: 1,
-    title: "Product 1",
-    description: "Description for product 1",
-    price: 100,
-  },
-  {
-    id: 1,
-    title: "Product 2",
-    description: "Description for product 2",
-    price: 200,
-  },
-  {
-    id: 3,
-    title: "Product 3",
-    description: "Description for product 3",
-    price: 300,
-  },
-];
-
 import { NextResponse } from "next/server";
 import connectDb from "@/util/db";
 import Product from "@/models/product";
@@ -29,7 +8,6 @@ export async function GET(req) {
   // retrieving the query params
   const searchParams = queryString.parseUrl(req.url).query;
   const { page } = searchParams || {};
-  console.log(page, "page");
 
   //api/product
   // {page: 5}
@@ -46,7 +24,7 @@ export async function GET(req) {
     // 24
     // total number of documents in product collection
     const totalProducts = await Product.countDocuments();
-    console.log(totalProducts, "totalProducts");
+
     // 25 -> 26 -> 27 -> 28 -> 29 -> 30
     // db_product_count -> 100
     // apple -> 30

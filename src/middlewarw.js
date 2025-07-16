@@ -12,7 +12,6 @@ export const config = {
 export default withAuth(
   async function middleware(req) {
     const url = req.nextUrl.pathname;
-    console.log(url, "url");
 
     const role = req?.nextauth?.token?.user?.role;
 
