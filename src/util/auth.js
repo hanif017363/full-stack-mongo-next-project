@@ -25,25 +25,35 @@ export const authOptions = {
           throw new Error("Invalid password");
         }
 
-        return user;
+        // Convert to plain JS object and remove password
+        const plainUser = user.toObject();
+        delete plainUser.password;
+
+        return plainUser; // Return plain object
       },
     }),
   ],
   callbacks: {
     async signIn({ user }) {
-      if (user) {
-        return true;
-      }
+      return !!user;
     },
-    jwt: async ({ token, user }) => {
-      await connectDb();
-      const userByEmail = await User.findOne({ email: token.email });
-      userByEmail.password = undefined; // Remove password from token
-      token.user = userByEmail;
+    async jwt({ token, user }) {
+      if (user) {
+        // First time login, attach user info to token
+        token.user = {
+          _id: user._id?.toString() || null,
+          name: user.name || null,
+          email: user.email || null,
+          image: user.image || null,
+          // Add other fields if needed, e.g. role
+        };
+      }
       return token;
     },
-    session: async ({ session, token }) => {
-      session.user = token.user;
+    async session({ session, token }) {
+      if (token?.user) {
+        session.user = token.user;
+      }
       return session;
     },
   },

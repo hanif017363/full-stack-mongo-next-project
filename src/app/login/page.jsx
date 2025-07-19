@@ -1,12 +1,12 @@
 "use client";
-
-import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { signIn } from "next-auth/react";
 
-const Login = () => {
+export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [loading, setLoading] = useState(false);
+  const [isLoading, setLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
 
   const router = useRouter();
@@ -15,93 +15,86 @@ const Login = () => {
     e.preventDefault();
     try {
       setLoading(true);
-      setErrorMessage("");
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/login`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ email, password }),
+
+      const result = await signIn("credentials", {
+        redirect: false,
+        email,
+        password,
       });
 
-      const data = await res.json();
-
-      if (!res.ok) {
+      if (result?.error) {
+        setErrorMessage(result?.error);
         setLoading(false);
-        setErrorMessage(
-          data.err || "Invalid email or password, please try again."
-        );
       } else {
         router.push("/");
       }
     } catch (err) {
+      console.log(err);
       setLoading(false);
-      setErrorMessage("Something went wrong, please try again.");
     }
   };
 
   return (
-    <main className="min-h-screen bg-gray-50 flex items-center justify-center py-12">
-      <section className="max-w-md w-full bg-white shadow-md rounded-lg p-8">
-        <h1 className="text-3xl font-bold text-gray-800 text-center mb-6">
+    <main className="flex items-center justify-center min-h-screen bg-gray-100">
+      <section className="bg-white p-8 rounded-2xl shadow-xl w-full max-w-md">
+        <h1 className="text-3xl font-bold mb-6 text-center text-gray-800">
           Login
         </h1>
-
-        <form onSubmit={submitHandler} className="space-y-6">
-          <div className="flex flex-col">
+        <form onSubmit={submitHandler} className="space-y-5">
+          <div>
             <label
               htmlFor="email"
-              className="text-sm font-medium text-gray-700 mb-1"
+              className="block text-sm font-medium text-gray-700"
             >
               Your Email
             </label>
             <input
               type="email"
               id="email"
+              required
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              required
-              className="border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="Enter your email"
+              className="mt-1 w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
 
-          <div className="flex flex-col">
+          <div>
             <label
               htmlFor="password"
-              className="text-sm font-medium text-gray-700 mb-1"
+              className="block text-sm font-medium text-gray-700"
             >
               Your Password
             </label>
             <input
               type="password"
               id="password"
+              required
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              required
-              className="border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="Enter your password"
+              className="mt-1 w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
 
-          <div className="flex flex-col items-center">
-            {!loading && (
+          {errorMessage && (
+            <div className="text-red-600 text-sm font-medium">
+              {errorMessage}
+            </div>
+          )}
+
+          <div>
+            {!isLoading ? (
               <button
                 type="submit"
-                className="bg-blue-600 text-white font-semibold py-2 px-4 rounded-md hover:bg-blue-700 transition-colors"
+                className="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition duration-200"
               >
                 Login
               </button>
-            )}
-            {loading && <p className="text-gray-600">Logging in...</p>}
-            {errorMessage && (
-              <p className="text-red-500 text-sm mt-2">{errorMessage}</p>
+            ) : (
+              <p className="text-center text-gray-600">Sending request...</p>
             )}
           </div>
         </form>
       </section>
     </main>
   );
-};
-
-export default Login;
+}

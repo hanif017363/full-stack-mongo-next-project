@@ -33,7 +33,7 @@ export default function ProductFilter() {
     fetchCategories();
   }, []);
 
-  // Helper: Create query string
+  // Helps: Create query string
   const createQueryString = (name, value) => {
     const params = new URLSearchParams(searchParams.toString());
 
@@ -51,7 +51,7 @@ export default function ProductFilter() {
     return params.toString();
   };
 
-  // Helper: Remove filter(s)
+  // Helps: Remove filter(s)
   const removeFilters = (keys) => {
     const params = new URLSearchParams(searchParams.toString());
     if (Array.isArray(keys)) {
@@ -64,7 +64,6 @@ export default function ProductFilter() {
     router.push(`${pathname}?${params.toString()}`);
   };
 
-  // Reusable styles
   const baseBtn =
     "px-4 py-1 text-sm rounded-full font-medium transition border";
   const activeBtn = `${baseBtn} bg-blue-600 text-white border-blue-600`;
@@ -79,8 +78,8 @@ export default function ProductFilter() {
           ✖ Clear All Filters
         </Link>
       </div>
+      {/* //filter section */}
 
-      {/* Price Filter */}
       <div>
         <h3 className="text-md font-semibold text-blue-600 mb-2">💰 Price</h3>
         <div className="flex flex-wrap gap-2">
@@ -123,7 +122,8 @@ export default function ProductFilter() {
         <h3 className="text-md font-semibold text-blue-600 mb-2">🗂 Category</h3>
         <div className="flex flex-wrap gap-2">
           {categories.map((c) => {
-            const isActive = searchParams.get("category") === c._id;
+            // Use title, not _id
+            const isActive = searchParams.get("category") === c.title;
 
             return (
               <div key={c._id} className="flex items-center gap-1">
@@ -131,7 +131,7 @@ export default function ProductFilter() {
                   className={isActive ? activeBtn : inactiveBtn}
                   onClick={() =>
                     router.push(
-                      `${pathname}?${createQueryString("category", c._id)}`
+                      `${pathname}?${createQueryString("category", c.title)}`
                     )
                   }
                 >

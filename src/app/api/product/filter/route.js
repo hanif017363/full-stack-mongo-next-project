@@ -1,10 +1,11 @@
 import { NextResponse } from "next/server";
-import connectDb from "@/util/db";
+
 import Product from "@/models/product";
 import queryString from "query-string";
+import connectDB from "@/util/db";
 
 export async function GET(req) {
-  await connectDb();
+  await connectDB();
   const searchParams = queryString.parseUrl(req.url).query;
   const { page, minPrice, maxPrice, category } = searchParams || {};
 
