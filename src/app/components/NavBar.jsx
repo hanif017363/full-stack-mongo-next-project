@@ -13,10 +13,13 @@ const NavBar = () => {
   return (
     <header className="bg-white shadow-md sticky top-0 z-50">
       <div className="container mx-auto px-4 py-3 flex justify-between items-center">
-        {/* Title (always visible on left) */}
-        <div className="text-xl font-bold text-gray-800">MyShop</div>
+        {/* Title with Link to Home */}
+        <Link href="/">
+          <h1 className="text-xl font-bold text-gray-800 cursor-pointer">
+            MyShop
+          </h1>
+        </Link>
 
-        {/* Mobile username (left side, mobile only) */}
         <div className="flex">
           {status === "authenticated" && (
             <div className="block md:hidden text-red-600 font-bold ">

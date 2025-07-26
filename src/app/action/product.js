@@ -17,7 +17,6 @@ export async function addProduct(prevState) {
     };
     await new Product(product).save();
   } catch (error) {
-    console.log(error);
     return {
       message: "Error creating product",
     };

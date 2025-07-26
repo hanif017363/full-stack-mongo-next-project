@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import connectDB from "@/utils/db";
+import connectDB from "@/util/db";
 import Product from "@/models/product";
 import { getToken } from "next-auth/jwt";
 

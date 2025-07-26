@@ -1,13 +1,16 @@
-// app/layout.jsx (or .js)
+// app/layout.jsx
 
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import Navbar from "./components/NavBar";
 import SessionProviderWrapper from "./components/SessionProvider";
-
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/util/auth";
 import CartProvider from "./context/Cart";
+
+// ✅ Add toastify import
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -25,7 +28,6 @@ export const metadata = {
 };
 
 export default async function RootLayout({ children }) {
-  // Fetch session on server side
   const session = await getServerSession(authOptions);
 
   return (
@@ -37,6 +39,8 @@ export default async function RootLayout({ children }) {
           <CartProvider>
             <Navbar />
             {children}
+
+            <ToastContainer position="bottom-right" autoClose={2000} />
           </CartProvider>
         </SessionProviderWrapper>
       </body>

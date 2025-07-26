@@ -1,11 +1,12 @@
 "use client";
 
 import { useState } from "react";
-import { useCart } from "@/app/contexts/Cart";
-import OrderSummary from "@/app/components/OrderSummary";
+import { useCart } from "../context/Cart";
+import OrderSummary from "../components/OrderSummary";
 
 export default function Checkout() {
   const { cart } = useCart();
+
   const [loading, setLoading] = useState(false);
 
   const submitHandler = async () => {
@@ -17,7 +18,7 @@ export default function Checkout() {
       }));
 
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API}/api/user/stripe/session`,
+        `${process.env.NEXT_PUBLIC_API_URL}/api/user/stripe/session`,
         {
           method: "POST",
           body: JSON.stringify({ cartItems: cartData }),
@@ -25,7 +26,6 @@ export default function Checkout() {
       );
 
       const data = await response.json();
-      console.log(data);
 
       if (response.ok) {
         window.location.href = data.url;
