@@ -43,7 +43,7 @@ export async function POST(req) {
         },
       },
       shipping_address_collection: {
-        allowed_countries: ["US"],
+        allowed_countries: ["US", "BD"],
       },
       customer_email: user?.email,
     });
