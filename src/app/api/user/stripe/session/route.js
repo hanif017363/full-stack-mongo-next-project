@@ -54,7 +54,7 @@ export async function POST(req) {
     console.log(err);
     return NextResponse.json({
       err: "Server error. Please try again",
-      status: 500,
+      status: 500,add
     });
   }
 }
